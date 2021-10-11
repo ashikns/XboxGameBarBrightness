@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B2BD4073-08BD-4453-B0CF-C71D0DCDEDE7}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>XboxGameBarBrightness.FullTrust</RootNamespace>
+    <AssemblyName>XboxGameBarBrightness.FullTrust</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <LangVersion>9.0</LangVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Helper\ArraySearch.cs">
+      <Link>Helper\ArraySearch.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Helper\OsVersion.cs">
+      <Link>Helper\OsVersion.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Helper\SimpleSerialization.cs">
+      <Link>Helper\SimpleSerialization.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\DdcMonitorItem.cs">
+      <Link>Models\Monitor\DdcMonitorItem.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\DeviceContext.cs">
+      <Link>Models\Monitor\DeviceContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\DeviceConversion.cs">
+      <Link>Models\Monitor\DeviceConversion.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\DeviceInformation.cs">
+      <Link>Models\Monitor\DeviceInformation.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\DisplayConfig.cs">
+      <Link>Models\Monitor\DisplayConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\DisplayMonitor.cs">
+      <Link>Models\Monitor\DisplayMonitor.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\Error.cs">
+      <Link>Models\Monitor\Error.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\IMonitor.cs">
+      <Link>Models\Monitor\IMonitor.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\LightSensor.cs">
+      <Link>Models\Monitor\LightSensor.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\MonitorConfiguration.cs">
+      <Link>Models\Monitor\MonitorConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\MonitorItem.cs">
+      <Link>Models\Monitor\MonitorItem.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\MonitorManager.cs">
+      <Link>Models\Monitor\MonitorManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\MSMonitor.cs">
+      <Link>Models\Monitor\MSMonitor.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\PowerManagement.cs">
+      <Link>Models\Monitor\PowerManagement.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\UnreachableMonitorItem.cs">
+      <Link>Models\Monitor\UnreachableMonitorItem.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Monitor\WmiMonitorItem.cs">
+      <Link>Models\Monitor\WmiMonitorItem.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Core\Models\Watcher\SystemEventsComplement.cs">
+      <Link>Models\Watcher\SystemEventsComplement.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitorian\Source\Monitorian.Supplement\DisplayInformation.cs">
+      <Link>Supplement\DisplayInformation.cs</Link>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts">
+      <Version>10.0.19041.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
