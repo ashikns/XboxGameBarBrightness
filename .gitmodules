@@ -1,0 +1,3 @@
+[submodule "Monitorian"]
+	path = Monitorian
+	url = https://github.com/emoacht/Monitorian
