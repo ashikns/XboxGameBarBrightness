@@ -9,30 +9,48 @@ namespace XboxGameBarBrightness.FullTrust
 {
     class Program
     {
-        static Dictionary<byte, IMonitor> _monitors = new();
-        static readonly object _lock = new object();
+        static readonly Dictionary<byte, IMonitor> _monitors = new();
+        static readonly object _lock = new();
 
-        static AppServiceConnection connection = null;
-        static AutoResetEvent appServiceExit;
+        static AppServiceConnection _connection = null;
+        static AutoResetEvent _disconnectEvent = null;
+
+        const string RunMutex = "XboxGameBarBrightness.FullTrust.Mutex.Run";
+        const string ConnectEvent = "XboxGameBarBrightness.FullTrust.Event.Connect";
 
         static void Main(string[] args)
         {
-            appServiceExit = new AutoResetEvent(false);
-            InitializeAppServiceConnection();
-            appServiceExit.WaitOne();
+            var runMutex = new Mutex(false, RunMutex);
+            if (runMutex.WaitOne(0, false))
+            {
+                _disconnectEvent = new AutoResetEvent(false);
+                var reconnectEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ConnectEvent);
+
+                while (true)
+                {
+                    InitializeAppServiceConnection();
+                    _disconnectEvent.WaitOne();
+                    reconnectEvent.WaitOne();
+                }
+            }
+            else
+            {
+                var reconnectEvent = EventWaitHandle.OpenExisting(ConnectEvent);
+                reconnectEvent.Set();
+            }
         }
 
         static async void InitializeAppServiceConnection()
         {
-            connection = new AppServiceConnection
+            _connection = new AppServiceConnection
             {
                 AppServiceName = "XboxGameBarBrightnessInteropService",
                 PackageFamilyName = Windows.ApplicationModel.Package.Current.Id.FamilyName
             };
-            connection.RequestReceived += Connection_RequestReceived;
-            connection.ServiceClosed += Connection_ServiceClosed;
+            _connection.RequestReceived += Connection_RequestReceived;
+            _connection.ServiceClosed += Connection_ServiceClosed;
 
-            AppServiceConnectionStatus status = await connection.OpenAsync();
+            AppServiceConnectionStatus status = await _connection.OpenAsync();
             if (status != AppServiceConnectionStatus.Success)
             {
                 // TODO: error handling
@@ -42,7 +60,7 @@ namespace XboxGameBarBrightness.FullTrust
         private static void Connection_ServiceClosed(AppServiceConnection sender, AppServiceClosedEventArgs args)
         {
             // signal the event so the process can shut down
-            appServiceExit.Set();
+            _disconnectEvent.Set();
         }
 
         private async static void Connection_RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
@@ -58,22 +76,32 @@ namespace XboxGameBarBrightness.FullTrust
                 {
                     case "populate":
                         {
-                            _monitors.Clear();
-                            var response = new ValueSet();
+                            if (_monitors.Count == 0)
+                            {
+                                foreach (var m in await MonitorManager.EnumerateMonitorsAsync())
+                                {
+                                    m.UpdateBrightness();
+                                    m.UpdateContrast();
 
-                            foreach (var m in await MonitorManager.EnumerateMonitorsAsync())
+                                    _monitors.Add(m.DisplayIndex, m);
+                                }
+                            }
+
+                            var response = new ValueSet();
+                            var idx = 0;
+
+                            foreach (var m in _monitors.Values)
                             {
                                 m.UpdateBrightness();
                                 m.UpdateContrast();
 
-                                _monitors.Add(m.DisplayIndex, m);
-
-                                var i = _monitors.Count - 1;
-                                response.Add($"index{i}", m.DisplayIndex);
-                                response.Add($"name{i}", m.Description);
-                                response.Add($"brightness{i}", m.Brightness);
-                                response.Add($"contrast{i}", m.Contrast);
+                                response.Add($"index{idx}", m.DisplayIndex);
+                                response.Add($"name{idx}", m.Description);
+                                response.Add($"brightness{idx}", m.Brightness);
+                                response.Add($"contrast{idx}", m.Contrast);
+                                idx++;
                             }
+
                             response.Add("count", _monitors.Count);
                             await args.Request.SendResponseAsync(response);
                             break;
