@@ -32,13 +32,26 @@ namespace XboxGameBarBrightness.UI
         private async Task Setup()
         {
             (Application.Current as App).AppServiceConnected += MainPage_AppServiceConnected;
+            (Application.Current as App).AppServiceDisconnected += MainPage_AppServiceDisconnected;
             await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
         }
 
         private void MainPage_AppServiceConnected(object sender, AppServiceConnection connection)
         {
-            _connection = (Application.Current as App).Connection;
+            _connection = connection;
             Populate();
+        }
+
+        private async void MainPage_AppServiceDisconnected(object sender, EventArgs e)
+        {
+            _connection = null;
+
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                Curtain.Visibility = Visibility.Visible;
+            });
+            await Task.Delay(3000);
+            await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
         }
 
         private async void Populate()
@@ -49,12 +62,13 @@ namespace XboxGameBarBrightness.UI
             };
             var response = await _connection.SendMessageAsync(request);
 
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => ProgressIndicator.IsActive = false);
-
-            var count = (int)response.Message["count"];
-            for (int i = 0; i < count; i++)
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                Monitors.Clear();
+                Curtain.Visibility = Visibility.Collapsed;
+
+                var count = (int)response.Message["count"];
+                for (int i = 0; i < count; i++)
                 {
                     Monitors.Add(new Monitor
                     {
@@ -63,8 +77,8 @@ namespace XboxGameBarBrightness.UI
                         Brightness = (int)response.Message[$"brightness{i}"],
                         Contrast = (int)response.Message[$"contrast{i}"]
                     });
-                });
-            }
+                }
+            });
         }
 
         private async void Brightness_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
@@ -99,6 +113,15 @@ namespace XboxGameBarBrightness.UI
             var response = await _connection.SendMessageAsync(args);
             var result = response.Status == AppServiceResponseStatus.Success ? (int)response.Message["contrast"] : -1;
             Debug.WriteLine($"Set contrast: {result}");
+        }
+
+        private async void Restart_Click(object sender, RoutedEventArgs e)
+        {
+            var request = new ValueSet
+            {
+                { "request", "exit" }
+            };
+            await _connection.SendMessageAsync(request);
         }
     }
 }

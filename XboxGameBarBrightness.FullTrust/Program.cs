@@ -14,6 +14,7 @@ namespace XboxGameBarBrightness.FullTrust
 
         static AppServiceConnection _connection = null;
         static AutoResetEvent _disconnectEvent = null;
+        static bool _exit = false;
 
         const string RunMutex = "XboxGameBarBrightness.FullTrust.Mutex.Run";
         const string ConnectEvent = "XboxGameBarBrightness.FullTrust.Event.Connect";
@@ -26,7 +27,7 @@ namespace XboxGameBarBrightness.FullTrust
                 _disconnectEvent = new AutoResetEvent(false);
                 var reconnectEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ConnectEvent);
 
-                while (true)
+                while (!_exit)
                 {
                     InitializeAppServiceConnection();
                     _disconnectEvent.WaitOne();
@@ -142,6 +143,14 @@ namespace XboxGameBarBrightness.FullTrust
                                 { "contrast", result },
                             };
                             await args.Request.SendResponseAsync(response);
+                            break;
+                        }
+                    case "exit":
+                        {
+                            _exit = true;
+                            _disconnectEvent.Set();
+                            var reconnectEvent = EventWaitHandle.OpenExisting(ConnectEvent);
+                            reconnectEvent.Set();
                             break;
                         }
                     default:

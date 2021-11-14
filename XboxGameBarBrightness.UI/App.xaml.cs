@@ -15,11 +15,12 @@ namespace XboxGameBarBrightness.UI
     /// </summary>
     sealed partial class App : Application
     {
-        private XboxGameBarWidget widgetInstance = null;
+        private XboxGameBarWidget _widgetInstance = null;
+        private BackgroundTaskDeferral _appServiceDeferral = null;
+        private AppServiceConnection _connection = null;
 
-        public BackgroundTaskDeferral AppServiceDeferral = null;
-        public AppServiceConnection Connection = null;
         public event EventHandler<AppServiceConnection> AppServiceConnected;
+        public event EventHandler AppServiceDisconnected;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -36,23 +37,26 @@ namespace XboxGameBarBrightness.UI
             // connection established from the fulltrust process
             if (args.TaskInstance.TriggerDetails is AppServiceTriggerDetails)
             {
-                AppServiceDeferral = args.TaskInstance.GetDeferral();
+                _appServiceDeferral = args.TaskInstance.GetDeferral();
                 args.TaskInstance.Canceled += OnTaskCanceled;
 
                 if (args.TaskInstance.TriggerDetails is AppServiceTriggerDetails details)
                 {
-                    Connection = details.AppServiceConnection;
-                    AppServiceConnected?.Invoke(this, Connection);
+                    _connection = details.AppServiceConnection;
+                    AppServiceConnected?.Invoke(this, _connection);
                 }
             }
         }
 
         private void OnTaskCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
         {
-            if (AppServiceDeferral != null)
+            if (_appServiceDeferral != null)
             {
-                AppServiceDeferral.Complete();
+                _appServiceDeferral.Complete();
             }
+
+            _connection = null;
+            AppServiceDisconnected?.Invoke(this, EventArgs.Empty);
         }
 
         protected override void OnActivated(IActivatedEventArgs args)
@@ -95,7 +99,7 @@ namespace XboxGameBarBrightness.UI
                 if (widgetArgs.IsLaunchActivation)
                 {
                     SetupRootFrame(null);
-                    widgetInstance = new XboxGameBarWidget(widgetArgs, Window.Current.CoreWindow, Window.Current.Content as Frame);
+                    _widgetInstance = new XboxGameBarWidget(widgetArgs, Window.Current.CoreWindow, Window.Current.Content as Frame);
                     Window.Current.Closed += Window_Closed;
                     Window.Current.Activate();
                 }
@@ -143,7 +147,7 @@ namespace XboxGameBarBrightness.UI
 
         private void Window_Closed(object sender, Windows.UI.Core.CoreWindowEventArgs e)
         {
-            widgetInstance = null;
+            _widgetInstance = null;
             Window.Current.Closed -= Window_Closed;
         }
 

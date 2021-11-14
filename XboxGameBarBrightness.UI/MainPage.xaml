@@ -15,7 +15,12 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <winui:ProgressRing Grid.RowSpan="2" x:Name="ProgressIndicator" IsActive="True" Height="75" Width="75" />
+        <Button Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Top" 
+                Width="40" Height="40" CornerRadius="25" 
+                Background="Transparent" Margin="10"
+                Click="Restart_Click">
+            <SymbolIcon Symbol="Refresh" Margin="-10"/>
+        </Button>
 
         <ListView Grid.Row="1" ItemsSource="{x:Bind Monitors}" HorizontalAlignment="Center">
             <ListView.ItemTemplate>
@@ -44,5 +49,9 @@
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
+
+        <Border x:Name="Curtain" Grid.RowSpan="2" Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
+            <winui:ProgressRing IsActive="True" Height="75" Width="75" />
+        </Border>
     </Grid>
 </Page>
